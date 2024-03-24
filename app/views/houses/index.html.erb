@@ -1,12 +1,22 @@
-<h1>Listing des Tiny Houses</h1>
+<!-- app/views/houses/index.html.erb -->
+<div class="container">
+  <h1>Discover Tiny Houses</h1>
+  <div class="house-listing">
+    <% @houses.each do |house| %>
+      <div class="house-card">
+        <% if house.image.attached? %>
+          <%= link_to image_tag(house.image, alt: house.title), house_path(house) %>
+        <% else %>
+          <!-- Afficher une image par défaut ou rien si aucune image n'est attachée -->
+          <%= link_to "View Details", house_path(house) %>
+        <% end %>
+        <div class="house-card-content">
+          <h2 class="house-card-title"><%= house.title %></h2>
+          <p class="house-card-price"><%= number_to_currency(house.price) %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
 
-<ul>
-  <% @houses.each do |house| %>
-    <li>
-      <%= link_to house.title, house_path(house) %>
-      - <%= house.description %>
-      - <%= number_to_currency(house.price) %>
-    </li>
-  <% end %>
-</ul>
 
