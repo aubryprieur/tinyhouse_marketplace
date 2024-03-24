@@ -1,2 +1,5 @@
-<h1>Houses#show</h1>
-<p>Find me in app/views/houses/show.html.erb</p>
+<h1><%= @house.title %></h1>
+
+<p><%= @house.description %></p>
+<p>Prix : <%= number_to_currency(@house.price) %></p>
+
