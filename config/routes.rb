@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   # Routes for Houses
-  resources :houses, only: [:index, :show]
+  resources :houses
 
   # Health check route
   get "up" => "rails/health#show", as: :rails_health_check

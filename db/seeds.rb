@@ -7,7 +7,7 @@ User.destroy_all
 
 # Création d'utilisateurs avec Faker
 user1 = User.create!(
-  email: Faker::Internet.email,
+  email: "seller@gmail.com",
   password: 'password',
   password_confirmation: 'password',
   role: 'seller' # Assurez-vous que votre modèle User peut gérer le champ 'role'
