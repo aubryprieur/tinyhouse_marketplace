@@ -1,6 +1,6 @@
 class HousesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_house, only: [:show, :update, :destroy]
+  before_action :set_house, only: [:show, :edit, :update, :destroy]
 
   def index
     @houses = House.all
@@ -8,6 +8,9 @@ class HousesController < ApplicationController
 
   def show
     @house = House.find(params[:id])
+  end
+
+  def edit
   end
 
   def new
@@ -37,7 +40,7 @@ class HousesController < ApplicationController
   def destroy
     authorize @house
     @house.destroy
-    redirect_to houses_url, notice: 'Maison supprimée avec succès.'
+    redirect_to houses_path, notice: 'Maison supprimée avec succès.'
   end
 
   private
