@@ -4,8 +4,28 @@
   <div class="house-listing">
     <% @houses.each do |house| %>
       <div class="house-card">
-        <% if house.image.attached? %>
-          <%= link_to image_tag(house.image, alt: house.title), house_path(house) %>
+        <% if house.images.attached? %>
+          <div id="carousel<%= house.id %>" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+              <% house.images.each_with_index do |image, index| %>
+                <div class="carousel-item <%= 'active' if index.zero? %>">
+                  <%= link_to house_path(house) do %>
+                    <%= image_tag(image.variant(resize_to_limit: [150, 150]), alt: house.title) %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <% if house.images.count > 1 %>
+              <a class="carousel-control-prev" href="#carousel<%= house.id %>" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carousel<%= house.id %>" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            <% end %>
+          </div>
         <% else %>
           <!-- Afficher une image par défaut ou rien si aucune image n'est attachée -->
           <%= link_to "View Details", house_path(house) %>
@@ -18,5 +38,6 @@
     <% end %>
   </div>
 </div>
+
 
 

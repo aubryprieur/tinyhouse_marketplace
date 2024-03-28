@@ -1,33 +1,8 @@
-<%= form_with(model: @house, local: true) do |form| %>
-  <% if @house.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@house.errors.count, "error") %> interdit(s) ce formulaire d'être enregistré :</h2>
+<!-- app/views/houses/new.html.erb -->
+<h1>New House</h1>
 
-      <ul>
-      <% @house.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+<%= render 'form', house: @house %>
 
-  <div class="field">
-    <%= form.label :title, "Titre" %>
-    <%= form.text_field :title, id: :house_title %>
-  </div>
+<%= link_to 'Back', houses_path %>
 
-  <div class="field">
-    <%= form.label :description, "Description" %>
-    <%= form.text_area :description, id: :house_description %>
-  </div>
-
-  <div class="field">
-    <%= form.label :price, "Prix" %>
-    <%= form.number_field :price, id: :house_price %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit "Enregistrer" %>
-  </div>
-<% end %>
 

@@ -1,7 +1,9 @@
 <!-- app/views/houses/show.html.erb -->
 <div class="container">
   <div class="house-details">
-    <%= image_tag(@house.image, alt: @house.title) if @house.image.attached? %>
+    <% @house.images.each do |image| %>
+      <%= image_tag image.variant(resize_to_limit: [100, 100]), class: "house-image" %>
+    <% end %>
     <h1><%= @house.title %></h1>
     <p><%= @house.description %></p>
     <p class="house-card-price"><%= number_to_currency(@house.price) %></p>
