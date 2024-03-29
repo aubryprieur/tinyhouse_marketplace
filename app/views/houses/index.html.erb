@@ -10,7 +10,7 @@
               <% house.images.each_with_index do |image, index| %>
                 <div class="carousel-item <%= 'active' if index.zero? %>">
                   <%= link_to house_path(house) do %>
-                    <%= image_tag(image.variant(resize_to_limit: [150, 150]), alt: house.title) %>
+                    <%= image_tag(image.variant(resize_to_limit: [500, 500]), alt: house.title) %>
                   <% end %>
                 </div>
               <% end %>

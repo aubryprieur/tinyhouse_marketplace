@@ -2,7 +2,7 @@
 <div class="container">
   <div class="house-details">
     <% @house.images.each do |image| %>
-      <%= image_tag image.variant(resize_to_limit: [100, 100]), class: "house-image" %>
+      <%= image_tag image.variant(resize_to_limit: [500, 500]), class: "house-image" %>
     <% end %>
     <h1><%= @house.title %></h1>
     <p><%= @house.description %></p>

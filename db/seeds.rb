@@ -1,4 +1,5 @@
 # db/seeds.rb
+
 require 'faker'
 
 # Nettoyage de la base de données
@@ -19,20 +20,24 @@ user2 = User.create!(
   role: 'buyer'
 )
 
-# Création de maisons avec Faker
+# Chemin vers vos images de seed
+seed_images = Dir[Rails.root.join('db/seed_images/*')]
+
+# Création de maisons avec des images attachées
 10.times do |i|
   house = House.create!(
-    title: Faker::Lorem.sentence(word_count: 3),
-    description: Faker::Lorem.paragraph(sentence_count: 2),
-    price: Faker::Commerce.price(range: 30000..100000),
+    title: "Maison #{i}",
+    description: "Description pour la maison #{i}",
+    price: rand(50000..300000),
     user: [user1, user2].sample # Assigner aléatoirement un des utilisateurs créés comme propriétaire
   )
 
-  # Supposons que vous avez des images nommées house1.jpg, house2.jpg, et house3.jpg dans app/assets/images/houses
-  if house.persisted?
-    image_path = Rails.root.join("app/assets/images/houses/house#{i % 3 + 1}.jpg")
-    house.image.attach(io: File.open(image_path), filename: "house#{i % 3 + 1}.jpg")
+  # Attacher de 1 à 3 images aléatoirement
+  rand(1..3).times do
+    image_path = seed_images.sample # Sélectionner une image aléatoire
+    house.images.attach(io: File.open(image_path), filename: File.basename(image_path))
   end
 end
 
 puts "Données seedées avec succès !"
+
