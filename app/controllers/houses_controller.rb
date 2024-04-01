@@ -4,6 +4,7 @@ class HousesController < ApplicationController
 
   def index
     @houses = House.all
+    @houses_with_address = House.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
   end
 
   def show
@@ -30,7 +31,13 @@ class HousesController < ApplicationController
 
   def update
     authorize @house
-    if @house.update(house_params)
+    # Vérifie s'il y a de nouvelles images à attacher
+    if house_params[:images]
+      @house.images.attach(house_params[:images])
+    end
+
+    # Mise à jour des autres attributs de @house sans les images
+    if @house.update(house_params.except(:images))
       redirect_to @house, notice: 'Maison mise à jour avec succès.'
     else
       render :edit
@@ -50,7 +57,7 @@ class HousesController < ApplicationController
   end
 
   def house_params
-    params.require(:house).permit(:title, :description, :price, images: [])
+    params.require(:house).permit(:title, :description, :price, :address, :city, :postal_code, images: [])
   end
 
 end

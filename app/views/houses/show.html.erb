@@ -6,6 +6,29 @@
     <% end %>
     <h1><%= @house.title %></h1>
     <p><%= @house.description %></p>
+    <% if @house.address.present? %>
+      <p>
+        <strong>Address:</strong>
+        <%= @house.address %>
+        <% if @house.postal_code.present? %>, <%= @house.postal_code %><% end %>
+        <% if @house.city.present? %> <%= @house.city %><% end %>
+      </p>
+    <% end %>
+    <% if @house.full_address.present? && @house.latitude && @house.longitude %>
+      <div id="house-map" style="height: 400px;"></div>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          var map = L.map('house-map').setView([<%= @house.latitude %>, <%= @house.longitude %>], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
+
+          var marker = L.marker([<%= @house.latitude %>, <%= @house.longitude %>]).addTo(map);
+          marker.bindPopup("<b><%= j(@house.title) %></b><br><%= j(@house.full_address) %>").openPopup();
+        });
+      </script>
+    <% end %>
     <p class="house-card-price"><%= number_to_currency(@house.price) %></p>
     <!-- Boutons de modification et de suppression -->
     <% if policy(@house).update? %>
@@ -16,4 +39,5 @@
     <% end %>
   </div>
 </div>
+
 
