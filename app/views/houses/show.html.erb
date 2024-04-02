@@ -37,6 +37,16 @@
     <% if policy(@house).destroy? %>
       <%= link_to 'Supprimer', house_path(@house), data: { turbo_method: :delete, turbo_confirm: 'Êtes-vous sûr ?' }, class: 'btn btn-danger' %>
     <% end %>
+    <!-- Formulaire pour mettre en avant la maison -->
+    <% if current_user.super_admin? %>
+      <%= form_with model: @house, local: true do |form| %>
+        <div class="form-group">
+          <%= form.label :featured, 'Mettre cette maison en avant' %>
+          <%= form.check_box :featured %>
+        </div>
+        <%= form.submit 'Mettre à jour', class: 'btn btn-info' %>
+      <% end %>
+    <% end %>
   </div>
 </div>
 

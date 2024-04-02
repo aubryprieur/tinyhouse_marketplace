@@ -6,6 +6,14 @@ require 'faker'
 House.destroy_all
 User.destroy_all
 
+# Création d'un compte super_admin
+super_admin = User.create!(
+  email: "superadmin@example.com",
+  password: 'password',
+  password_confirmation: 'password',
+  role: 'super_admin'
+)
+
 # Création d'utilisateurs avec Faker
 user1 = User.create!(
   email: "seller@gmail.com",
@@ -29,6 +37,10 @@ seed_images = Dir[Rails.root.join('db/seed_images/*')]
     title: "Maison #{i}",
     description: "Description pour la maison #{i}",
     price: rand(50000..300000),
+    address: Faker::Address.street_address,
+    city: Faker::Address.city,
+    postal_code: Faker::Address.zip_code,
+    featured: [true, false].sample, # Ajouter une valeur aléatoire pour `featured`
     user: [user1, user2].sample # Assigner aléatoirement un des utilisateurs créés comme propriétaire
   )
 

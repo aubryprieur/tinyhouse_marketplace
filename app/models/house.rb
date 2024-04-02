@@ -4,6 +4,7 @@ class House < ApplicationRecord
   has_many_attached :images
 
   validate :image_type, :image_count
+  validates :featured, inclusion: { in: [true, false] }
   geocoded_by :full_address
   after_validation :geocode, if: ->(obj){ obj.will_save_change_to_address? || obj.will_save_change_to_city? || obj.will_save_change_to_postal_code? }
 
