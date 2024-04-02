@@ -1,5 +1,16 @@
 <!-- app/views/houses/index.html.erb -->
 <div class="container">
+  <%= form_with url: search_houses_path, method: :get, class: "search-bar", data: { turbo_frame: "houses" } do |form| %>
+    <div class="search-fields">
+      <%= form.text_field :city, placeholder: "Rechercher une ville", value: params[:city] %>
+      <%= form.number_field :radius, placeholder: "Rayon de recherche (km)", value: params[:radius] %>
+      <%= form.number_field :max_price, placeholder: "Montant maxi", value: params[:max_price] %>
+      <%= form.submit "Rechercher" %>
+    </div>
+    <%= link_to "Effacer les filtres", search_houses_path, class: "reset-filters", data: { turbo_frame: "houses" } %>
+  <% end %>
+
+<div class="container">
   <h1>Discover Tiny Houses</h1>
   <div class="flex-container">
 

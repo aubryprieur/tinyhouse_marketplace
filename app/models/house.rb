@@ -7,6 +7,7 @@ class House < ApplicationRecord
   validates :featured, inclusion: { in: [true, false] }
   geocoded_by :full_address
   after_validation :geocode, if: ->(obj){ obj.will_save_change_to_address? || obj.will_save_change_to_city? || obj.will_save_change_to_postal_code? }
+  scope :featured, -> { where(featured: true) }
 
   def full_address
     [address, city, postal_code].compact.join(', ')

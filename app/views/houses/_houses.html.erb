@@ -1,0 +1,25 @@
+<!-- app/views/houses/_houses.html.erb -->
+<% houses.each do |house| %>
+  <div class="house-card">
+    <% if house.images.attached? %>
+      <%= image_tag house.images.first.variant(resize_to_limit: [300, 300]), class: "house-image" %>
+    <% end %>
+    <div class="house-details">
+      <h3><%= house.title %></h3>
+      <p><%= number_to_currency(house.price) %> / nuit</p>
+      <p><%= house.address %>, <%= house.city %></p>
+      <%= link_to 'Voir les détails', house_path(house), class: 'details-link' %>
+      <% if current_user&.super_admin? %>
+        <!-- Ici, nous supposons que vous avez ajouté une méthode helper pour vérifier si l'utilisateur est un super_admin -->
+        <div class="featured-checkbox">
+          <%= form_with model: house, url: feature_house_path(house), method: :patch, local: false do |form| %>
+            <%= form.check_box :featured %>
+            <%= form.label :featured, 'Mise en avant' %>
+            <%= form.submit "Mettre à jour" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+

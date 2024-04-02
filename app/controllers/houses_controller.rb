@@ -7,6 +7,36 @@ class HousesController < ApplicationController
     @houses_with_address = House.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
   end
 
+  def search
+    @houses = House.all
+    if params[:city].present?
+      @houses = @houses.near(params[:city], params[:radius].to_f)
+    end
+
+    if params[:max_price].present?
+      @houses = @houses.where("price <= ?", params[:max_price].to_f)
+    end
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("houses", partial: "houses/houses", locals: { houses: @houses })
+      end
+      format.html { render :index }
+    end
+  end
+
+  def feature
+    @house = House.find(params[:id])
+    if @house.update(featured_params)
+      respond_to do |format|
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(@house, partial: "houses/house", locals: { house: @house }) }
+        format.html { redirect_to houses_path, notice: 'Maison mise à jour.' }
+      end
+    else
+      render :show, status: :unprocessable_entity
+    end
+  end
+
   def show
     @house = House.find(params[:id])
   end
@@ -58,6 +88,10 @@ class HousesController < ApplicationController
 
   def house_params
     params.require(:house).permit(:title, :description, :price, :address, :city, :postal_code, :featured, :latitude, :longitude, images: [])
+  end
+
+  def featured_params
+    params.require(:house).permit(:featured)
   end
 
 end
