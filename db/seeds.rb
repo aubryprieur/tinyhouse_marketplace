@@ -3,6 +3,7 @@
 require 'faker'
 
 # Nettoyage de la base de données
+Message.destroy_all
 House.destroy_all
 User.destroy_all
 
@@ -11,20 +12,23 @@ super_admin = User.create!(
   email: "superadmin@example.com",
   password: 'password',
   password_confirmation: 'password',
+  phone_number: Faker::PhoneNumber.phone_number,
   role: 'super_admin'
 )
 
 # Création d'utilisateurs avec Faker
 user1 = User.create!(
-  email: "seller@gmail.com",
+  email: "user1@gmail.com",
   password: 'password',
   password_confirmation: 'password',
+  phone_number: Faker::PhoneNumber.phone_number,
   role: 'seller' # Assurez-vous que votre modèle User peut gérer le champ 'role'
 )
 user2 = User.create!(
-  email: Faker::Internet.email,
+  email: "user2@gmail.com",
   password: 'password',
   password_confirmation: 'password',
+  phone_number: Faker::PhoneNumber.phone_number,
   role: 'buyer'
 )
 

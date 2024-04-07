@@ -1,0 +1,6 @@
+<%= form_with model: [ @house, @message ] do |form| %>
+  <%= form.hidden_field :user_id, value: @user.id %>
+  <%= form.text_area :content %>
+  <%= form.submit "Envoyer le message" %>
+<% end %>
+

@@ -6,9 +6,24 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
-      <li class="nav-item active">
+      <li class="nav-item">
         <%= link_to 'Vendre ma tinyhouse', new_house_path, class: 'nav-link' %>
       </li>
+      <% if user_signed_in? %>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Mon compte
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <%= link_to 'Mettre à jour mon profil', edit_user_registration_path, class: 'dropdown-item' %>
+            <%= form_with url: destroy_user_session_path, method: :delete, local: true do |form| %>
+              <%= form.submit 'Déconnexion', class: 'dropdown-item' %>
+            <% end %>
+            <%= link_to 'Mes messages', user_messages_path(current_user) if user_signed_in? %>
+          </div>
+        </li>
+      <% end %>
     </ul>
   </div>
 </nav>
+

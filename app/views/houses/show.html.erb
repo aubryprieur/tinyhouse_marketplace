@@ -47,6 +47,16 @@
         <%= form.submit 'Mettre à jour', class: 'btn btn-info' %>
       <% end %>
     <% end %>
+    <!-- Condition pour vérifier si l'utilisateur est connecté -->
+    <% if user_signed_in? %>
+      <div id="phone-number">
+        <button data-controller="house" data-action="click->house#showPhoneNumber" data-house-phone-number-value="<%= @house.user.phone_number %>">Voir le numéro</button>
+      </div>
+
+      <%= link_to "Envoyer un message", new_house_message_path(@house), class: "btn" %>
+    <% else %>
+      <%= link_to "Se connecter pour voir les coordonnées", new_user_session_path %>
+    <% end %>
   </div>
 </div>
 

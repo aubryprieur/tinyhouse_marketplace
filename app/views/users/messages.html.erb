@@ -1,0 +1,9 @@
+<h1>Messages reçus</h1>
+
+<% @messages.each do |message| %>
+  <div class="message">
+    <p><strong>De :</strong> <%= message.user.email %></p>
+    <p><strong>Concernant la maison :</strong> <%= message.house.title %></p>
+    <p><%= message.content %></p>
+  </div>
+<% end %>
