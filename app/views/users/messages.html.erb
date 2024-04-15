@@ -1,9 +1,32 @@
-<h1>Messages reçus</h1>
+<h1>Messages</h1>
 
-<% @messages.each do |message| %>
-  <div class="message">
-    <p><strong>De :</strong> <%= message.user.email %></p>
-    <p><strong>Concernant la maison :</strong> <%= message.house.title %></p>
-    <p><%= message.content %></p>
-  </div>
+<% @houses.each do |house| %>
+  <% if house.present? %>
+    <div class="card mb-3">
+      <div class="card-header">
+        <strong>Maison :</strong> <%= house.title %>
+        <% if house.images.attached? %>
+          <%= image_tag(house.images.first.variant(resize_to_limit: [100, 100])) %>
+        <% end %>
+      </div>
+      <div class="card-body">
+        <% house.messages.each do |message| %>
+          <div class="<%= message.user == current_user ? 'sent' : 'received' %> message">
+            <p><%= message.content %></p>
+            <div class="text-muted">
+              <small>Envoyé par: <%= message.user.email %>, <%= time_ago_in_words(message.created_at) %> ago</small>
+            </div>
+          </div>
+        <% end %>
+        <%= form_with(model: [house, house.messages.build], local: true) do |form| %>
+          <%= form.hidden_field :house_id, value: house.id %>
+          <%= form.text_area :content, rows: 2, placeholder: "Type your message here", class: 'form-control' %>
+          <%= form.submit "Send", class: 'btn btn-primary mt-2' %>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <p>Une erreur est survenue, maison non trouvée.</p>
+  <% end %>
 <% end %>
+
