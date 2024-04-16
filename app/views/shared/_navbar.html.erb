@@ -16,14 +16,25 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <%= link_to 'Mettre à jour mon profil', edit_user_registration_path, class: 'dropdown-item' %>
+            <%= link_to 'Mes messages', user_messages_path(current_user), class: 'dropdown-item' %>
+            <% if current_user.super_admin? %>
+              <%= link_to 'Dashboard', admin_dashboard_path, class: 'dropdown-item' %>
+            <% end %>
             <%= form_with url: destroy_user_session_path, method: :delete, local: true do |form| %>
               <%= form.submit 'Déconnexion', class: 'dropdown-item' %>
             <% end %>
-            <%= link_to 'Mes messages', user_messages_path(current_user) if user_signed_in? %>
           </div>
+        </li>
+      <% else %>
+        <li class="nav-item">
+          <%= link_to 'Connexion', new_user_session_path, class: 'nav-link' %>
+        </li>
+        <li class="nav-item">
+          <%= link_to 'Inscription', new_user_registration_path, class: 'nav-link' %>
         </li>
       <% end %>
     </ul>
   </div>
 </nav>
+
 
