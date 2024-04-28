@@ -6,6 +6,7 @@ class AdminController < ApplicationController
     @total_users = User.count
     @total_houses = House.count
     @average_price = House.average(:price).to_f.round(2)
+    @reports = Report.includes(:house, :user).where(resolved: false)
   end
 
   private

@@ -13,6 +13,9 @@
         <%= button_to 'Add to Favorites', house_favorites_path(@house), method: :post, class: "btn btn-primary" %>
       <% end %>
     </p>
+    <% if user_signed_in? && current_user != @house.user %>
+        <%= button_to 'Signaler cette maison', house_reports_path(@house), method: :post, class: "btn btn-danger" %>
+    <% end %>
     <% if @house.address.present? %>
       <p>
         <strong>Address:</strong>

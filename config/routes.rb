@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   authenticate :user, lambda { |u| u.super_admin? } do
     get 'admin/dashboard', to: 'admin#dashboard', as: 'admin_dashboard'
     patch 'reports/:id/resolve', to: 'reports#resolve', as: 'resolve_report'
+    resources :reports, only: [:index, :show, :update]
   end
 
   # Vous pouvez définir une de vos actions comme page d'accueil, par exemple :

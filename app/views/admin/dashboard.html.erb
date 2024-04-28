@@ -13,4 +13,17 @@
     <h2>Average Price of Houses</h2>
     <p>$<%= @average_price %></p>
   </div>
+
+<div class="reported-houses">
+  <h2>Maisons Signalées</h2>
+  <% @reports.each do |report| %>
+    <div class="report">
+      <p>Maison signalée: <%= link_to report.house.title, house_path(report.house) %></p>
+      <p>Signalé par: <%= report.user.email %></p>
+      <!-- Bouton pour résoudre le signalement -->
+      <%= button_to 'Résoudre', resolve_report_path(report), method: :patch, class: 'btn btn-success' %>
+    </div>
+  <% end %>
+</div>
+
 </div>

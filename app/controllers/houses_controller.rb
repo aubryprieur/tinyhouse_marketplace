@@ -1,22 +1,16 @@
 class HousesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_house, only: [:show, :edit, :update, :destroy]
+  before_action :check_reported, only: [:show]
+  before_action :set_houses, only: [:index, :search]
+
 
   def index
-    @houses = House.all
-    @houses_with_address = House.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
+    @houses_with_address = filtered_houses.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
   end
 
   def search
-    @houses = House.all
-    if params[:city].present?
-      @houses = @houses.near(params[:city], params[:radius].to_f)
-    end
-
-    if params[:max_price].present?
-      @houses = @houses.where("price <= ?", params[:max_price].to_f)
-    end
-
+    filter_houses_by_params
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("houses", partial: "houses/houses", locals: { houses: @houses })
@@ -93,6 +87,25 @@ class HousesController < ApplicationController
 
   def featured_params
     params.require(:house).permit(:featured)
+  end
+
+  def check_reported
+    if @house.reports.exists?(resolved: false) && !current_user.super_admin?
+      redirect_to root_path, alert: "Cette maison a été signalée et n'est pas accessible."
+    end
+  end
+
+  def set_houses
+    @houses = current_user.super_admin? ? House.all : filtered_houses
+  end
+
+  def filtered_houses
+    House.includes(:reports).where.not(id: Report.where(resolved: false).select(:house_id))
+  end
+
+  def filter_houses_by_params
+    @houses = @houses.near(params[:city], params[:radius].to_f) if params[:city].present?
+    @houses = @houses.where("price <= ?", params[:max_price].to_f) if params[:max_price].present?
   end
 
 end
