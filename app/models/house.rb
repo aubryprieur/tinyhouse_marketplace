@@ -4,6 +4,7 @@ class House < ApplicationRecord
   has_many :favorites
   has_many :favorited_by, through: :favorites, source: :user
   has_many_attached :images
+  has_many :reports
 
   validate :image_type, :image_count
   validates :featured, inclusion: { in: [true, false] }
@@ -13,6 +14,10 @@ class House < ApplicationRecord
 
   def full_address
     [address, city, postal_code].compact.join(', ')
+  end
+
+  def reported?
+    reports.any? && !reports.where(resolved: false).empty?
   end
 
   private
