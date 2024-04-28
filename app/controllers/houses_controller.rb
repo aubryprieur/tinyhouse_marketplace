@@ -39,6 +39,7 @@ class HousesController < ApplicationController
 
   def show
     @house = House.find(params[:id])
+    @is_favorite = current_user.favorite_houses.exists?(@house.id)
   end
 
   def edit

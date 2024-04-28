@@ -10,6 +10,10 @@ class UsersController < ApplicationController
     end
   end
 
+  def favorites
+    @favorite_houses = current_user.favorites.includes(:house).map(&:house)
+  end
+
   private
 
   def set_user

@@ -7,6 +7,8 @@ class User < ApplicationRecord
 
   has_many :houses, dependent: :destroy
   has_many :messages
+  has_many :favorites
+  has_many :favorite_houses, through: :favorites, source: :house
 
   enum role: { super_admin: 0, seller: 1, buyer: 2 }
 

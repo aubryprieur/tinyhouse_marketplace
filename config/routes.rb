@@ -3,7 +3,9 @@ Rails.application.routes.draw do
   devise_for :users
 
   # Routes for Houses
-  resources :houses
+  resources :houses do
+    resource :favorites, only: [:create, :destroy]
+  end
 
   # Health check route
   get "up" => "rails/health#show", as: :rails_health_check
@@ -14,6 +16,7 @@ Rails.application.routes.draw do
     resources :messages, only: [:new, :create]
   end
   get 'users/:id/messages', to: 'users#messages', as: 'user_messages'
+  get 'favorites', to: 'users#favorites', as: 'user_favorites'
 
 
   authenticate :user, lambda { |u| u.super_admin? } do

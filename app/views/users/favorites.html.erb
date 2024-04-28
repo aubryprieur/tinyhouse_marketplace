@@ -1,0 +1,12 @@
+<h1>Mes Maisons Favorites</h1>
+<div class="houses">
+  <% @favorite_houses.each do |house| %>
+    <div class="house">
+      <%= image_tag(house.images.first.variant(resize_to_limit: [100, 100])) if house.images.attached? %>
+      <h2><%= link_to house.title, house %></h2>
+      <p><%= house.description %></p>
+      <!-- Add more details or actions as needed -->
+    </div>
+  <% end %>
+</div>
+

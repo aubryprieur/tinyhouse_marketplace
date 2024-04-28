@@ -16,6 +16,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <%= link_to 'Mettre à jour mon profil', edit_user_registration_path, class: 'dropdown-item' %>
+            <%= link_to 'Mes Maisons Favorites', user_favorites_path, class: 'dropdown-item'%>
             <%= link_to 'Mes messages', user_messages_path(current_user), class: 'dropdown-item' %>
             <% if current_user.super_admin? %>
               <%= link_to 'Dashboard', admin_dashboard_path, class: 'dropdown-item' %>

@@ -6,6 +6,13 @@
     <% end %>
     <h1><%= @house.title %></h1>
     <p><%= @house.description %></p>
+    <p>
+      <% if @is_favorite %>
+        <%= button_to 'Remove from Favorites', house_favorites_path(@house), method: :delete, class: "btn btn-danger" %>
+      <% else %>
+        <%= button_to 'Add to Favorites', house_favorites_path(@house), method: :post, class: "btn btn-primary" %>
+      <% end %>
+    </p>
     <% if @house.address.present? %>
       <p>
         <strong>Address:</strong>
