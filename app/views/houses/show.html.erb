@@ -13,8 +13,12 @@
         <%= button_to 'Add to Favorites', house_favorites_path(@house), method: :post, class: "btn btn-primary" %>
       <% end %>
     </p>
-    <% if user_signed_in? && current_user != @house.user %>
+    <% if user_signed_in? %>
+      <% if current_user.super_admin? && @house.reported? %>
+        <%= button_to 'Maison signalée', resolve_report_path(@house.current_report), method: :patch, class: "btn btn-warning" %>
+      <% elsif current_user != @house.user %>
         <%= button_to 'Signaler cette maison', house_reports_path(@house), method: :post, class: "btn btn-danger" %>
+      <% end %>
     <% end %>
     <% if @house.address.present? %>
       <p>

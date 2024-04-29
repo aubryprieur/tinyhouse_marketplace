@@ -17,7 +17,11 @@ class House < ApplicationRecord
   end
 
   def reported?
-    reports.any? && !reports.where(resolved: false).empty?
+    reports.exists?(resolved: false)
+  end
+
+  def current_report
+    reports.where(resolved: false).first
   end
 
   private
