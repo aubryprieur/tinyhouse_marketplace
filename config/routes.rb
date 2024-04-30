@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     resource :favorites, only: [:create, :destroy]
   end
 
+  patch 'houses/:id/validate', to: 'houses#validate', as: 'validate_house'
+
   # Health check route
   get "up" => "rails/health#show", as: :rails_health_check
   get 'search_houses', to: 'houses#search'

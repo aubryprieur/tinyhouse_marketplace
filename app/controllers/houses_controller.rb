@@ -1,6 +1,6 @@
 class HousesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_house, only: [:show, :edit, :update, :destroy]
+  before_action :set_house, only: [:show, :edit, :update, :destroy, :validate]
   before_action :check_reported, only: [:show]
   before_action :set_houses, only: [:index, :search]
 
@@ -31,6 +31,15 @@ class HousesController < ApplicationController
     end
   end
 
+  def validate
+    if current_user.super_admin? && !@house.validated?
+      @house.update(validated: true)
+      redirect_to admin_dashboard_path, notice: 'Maison validée et publiée.'
+    else
+      redirect_to admin_dashboard_path, alert: 'La validation de la maison a échoué.'
+    end
+  end
+
   def show
     @house = House.find(params[:id])
     @is_favorite = current_user.favorite_houses.exists?(@house.id)
@@ -48,7 +57,7 @@ class HousesController < ApplicationController
     @house.user = current_user
     authorize @house
     if @house.save
-      redirect_to @house, notice: 'Maison créée avec succès.'
+      redirect_to houses_path, notice: 'Maison créée avec succès et en attente de validation.'
     else
       render :new
     end
@@ -95,12 +104,16 @@ class HousesController < ApplicationController
     end
   end
 
-  def set_houses
-    @houses = current_user.super_admin? ? House.all : filtered_houses
-  end
-
   def filtered_houses
     House.includes(:reports).where.not(id: Report.where(resolved: false).select(:house_id))
+  end
+
+  def set_houses
+    @houses = if current_user.super_admin?
+                filtered_houses
+              else
+                House.where(validated: true)
+              end
   end
 
   def filter_houses_by_params
