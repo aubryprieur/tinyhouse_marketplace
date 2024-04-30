@@ -3,8 +3,8 @@ class House < ApplicationRecord
   has_many :messages
   has_many :favorites
   has_many :favorited_by, through: :favorites, source: :user
-  has_many_attached :images
   has_many :reports
+  has_many_attached :images
 
   validate :image_type, :image_count
   validates :featured, inclusion: { in: [true, false] }

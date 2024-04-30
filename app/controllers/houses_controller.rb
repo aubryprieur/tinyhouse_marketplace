@@ -6,10 +6,12 @@ class HousesController < ApplicationController
 
 
   def index
+    @houses = filtered_houses
     @houses_with_address = filtered_houses.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
   end
 
   def search
+    @houses = filtered_houses
     filter_houses_by_params
     respond_to do |format|
       format.turbo_stream do
@@ -105,8 +107,13 @@ class HousesController < ApplicationController
   end
 
   def filtered_houses
-    House.includes(:reports).where.not(id: Report.where(resolved: false).select(:house_id))
+    if current_user.super_admin?
+      House.all
+    else
+      House.includes(:reports).where.not(id: Report.where(resolved: false).select(:house_id))
+    end
   end
+
 
   def set_houses
     @houses = if current_user.super_admin?
