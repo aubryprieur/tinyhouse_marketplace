@@ -6,18 +6,23 @@ class HousesController < ApplicationController
 
 
   def index
-    @houses = filtered_houses
-    @houses_with_address = filtered_houses.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
+    @houses_with_address = @houses.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
   end
 
   def search
-    @houses = filtered_houses
     filter_houses_by_params
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("houses", partial: "houses/houses", locals: { houses: @houses })
-      end
+      format.turbo_stream { render turbo_stream: turbo_stream.replace("houses", partial: "houses/houses", locals: { houses: @houses }) }
       format.html { render :index }
+    end
+  end
+
+  def validate
+    if current_user.super_admin? && !@house.validated?
+      @house.update(validated: true)
+      redirect_to admin_dashboard_path, notice: 'Maison validée et publiée.'
+    else
+      redirect_to admin_dashboard_path, alert: 'La validation de la maison a échoué.'
     end
   end
 
@@ -30,15 +35,6 @@ class HousesController < ApplicationController
       end
     else
       render :show, status: :unprocessable_entity
-    end
-  end
-
-  def validate
-    if current_user.super_admin? && !@house.validated?
-      @house.update(validated: true)
-      redirect_to admin_dashboard_path, notice: 'Maison validée et publiée.'
-    else
-      redirect_to admin_dashboard_path, alert: 'La validation de la maison a échoué.'
     end
   end
 
@@ -92,6 +88,20 @@ class HousesController < ApplicationController
     @house = House.find(params[:id])
   end
 
+  def set_houses
+    base_query = House.all
+    base_query = base_query.where.not(id: Report.where(resolved: false).select(:house_id)) unless current_user.super_admin?
+    base_query = base_query.where(validated: true) unless current_user.super_admin?
+    @houses = base_query
+  end
+
+  def filter_houses_by_params
+    if params[:city].present?
+      @houses = @houses.near(params[:city], params[:radius].to_f)
+    end
+    @houses = @houses.where("price <= ?", params[:max_price].to_f) if params[:max_price].present?
+  end
+
   def house_params
     params.require(:house).permit(:title, :description, :price, :address, :city, :postal_code, :featured, :latitude, :longitude, images: [])
   end
@@ -114,18 +124,8 @@ class HousesController < ApplicationController
     end
   end
 
-
-  def set_houses
-    @houses = if current_user.super_admin?
-                filtered_houses
-              else
-                House.where(validated: true)
-              end
-  end
-
-  def filter_houses_by_params
-    @houses = @houses.near(params[:city], params[:radius].to_f) if params[:city].present?
-    @houses = @houses.where("price <= ?", params[:max_price].to_f) if params[:max_price].present?
+  def filter_validated_houses
+    @houses = current_user.super_admin? ? House.all : House.where(validated: true)
   end
 
 end
