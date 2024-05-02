@@ -3,13 +3,15 @@
 require 'faker'
 
 # Nettoyage de la base de données
+Report.destroy_all
+Favorite.destroy_all
 Message.destroy_all
 House.destroy_all
 User.destroy_all
 
 # Création d'un compte super_admin
 super_admin = User.create!(
-  email: "superadmin@example.com",
+  email: "admin@gmail.com",
   password: 'password',
   password_confirmation: 'password',
   phone_number: Faker::PhoneNumber.phone_number,
@@ -35,17 +37,32 @@ user2 = User.create!(
 # Chemin vers vos images de seed
 seed_images = Dir[Rails.root.join('db/seed_images/*')]
 
-# Création de maisons avec des images attachées
-10.times do |i|
+# Liste des adresses à ajouter
+addresses = [
+  { address: "44 rue de la halle", postal_code: "59800", city: "Lille" },
+  { address: "25 quai de l’oise", postal_code: "75019", city: "Paris" },
+  { address: "Route de Filsac", postal_code: "46100", city: "Figeac" },
+  { address: "9 Grande Rue", postal_code: "21200", city: "Ruffey-lès-Beaune" },
+  { address: "", postal_code: "19170", city: "Gourdon-Murat" }, # Adresse vide car non spécifiée
+  { address: "Rue du Roc", postal_code: "34700", city: "Lodève" },
+  { address: "1 Rue de la Paix", postal_code: "04120", city: "Castellane" },
+  { address: "", postal_code: "40700", city: "Doazit" }, # Adresse vide car non spécifiée
+  { address: "38 Rte du Petit Cougour", postal_code: "03410", city: "Lignerolles" },
+  { address: "3-1 Le Cleuziou", postal_code: "", city: "Priziac" } # Code postal vide car non spécifié
+]
+
+
+# Création de maisons avec des adresses spécifiées
+addresses.each do |addr|
   house = House.create!(
-    title: "Maison #{i}",
-    description: "Description pour la maison #{i}",
+    title: "Maison à #{addr[:city]}",
+    description: Faker::Lorem.sentence(word_count: 10),
     price: rand(50000..300000),
-    address: Faker::Address.street_address,
-    city: Faker::Address.city,
-    postal_code: Faker::Address.zip_code,
-    featured: [true, false].sample, # Ajouter une valeur aléatoire pour `featured`
-    user: [user1, user2].sample # Assigner aléatoirement un des utilisateurs créés comme propriétaire
+    address: addr[:address],
+    postal_code: addr[:postal_code],
+    city: addr[:city],
+    featured: [true, false].sample,
+    user: [user1, user2].sample
   )
 
   # Attacher de 1 à 3 images aléatoirement
