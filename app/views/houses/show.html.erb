@@ -62,16 +62,31 @@
       <% end %>
     <% end %>
     <!-- Condition pour vérifier si l'utilisateur est connecté -->
-    <% if user_signed_in? %>
+     <!-- <% if user_signed_in? %>
       <div id="phone-number">
         <button data-controller="house" data-action="click->house#showPhoneNumber" data-house-phone-number-value="<%= @house.user.phone_number %>">Voir le numéro</button>
       </div>
-
-      <%= link_to "Envoyer un message", new_house_message_path(@house), class: "btn" %>
     <% else %>
       <%= link_to "Se connecter pour voir les coordonnées", new_user_session_path %>
-    <% end %>
+    <% end %>-->
+
+    <%= link_to "Envoyer un message", new_house_message_path(@house), class: "btn" %>
+
+    <button id="toggle-phone" data-phone="<%= @house.user.phone_number  %>">Voir le numéro</button>
+    <script>
+      document.getElementById("toggle-phone").addEventListener("click", function() {
+        const button = this;
+        const phoneNumber = button.getAttribute('data-phone');
+        if (button.textContent === "Voir le numéro") {
+          button.textContent = phoneNumber;  // Affiche le numéro de téléphone
+        } else {
+          button.textContent = "Voir le numéro";  // Remet le texte original
+        }
+      });
+    </script>
+
   </div>
 </div>
+
 
 
