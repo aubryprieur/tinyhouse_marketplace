@@ -7,9 +7,13 @@ class House < ApplicationRecord
   has_many_attached :images
 
   validate :image_type, :image_count
+  validate :validate_images_count
   validates :featured, inclusion: { in: [true, false] }
+
   geocoded_by :full_address
+
   after_validation :geocode, if: ->(obj){ obj.will_save_change_to_address? || obj.will_save_change_to_city? || obj.will_save_change_to_postal_code? }
+
   scope :featured, -> { where(featured: true) }
 
   def full_address
@@ -37,6 +41,12 @@ class House < ApplicationRecord
   def image_count
     if images.length > 3
       errors.add(:images, 'Vous ne pouvez pas télécharger plus de 3 images')
+    end
+  end
+
+  def validate_images_count
+    if images.attached? && images.size > 3 && !payment_status
+      errors.add(:images, "Vous ne pouvez pas télécharger plus de 3 images sans paiement.")
     end
   end
 

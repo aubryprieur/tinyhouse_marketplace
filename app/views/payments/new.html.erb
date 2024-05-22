@@ -1,0 +1,43 @@
+<!-- app/views/payments/new.html.erb -->
+<%= form_tag house_payments_path(@house), id: 'payment-form' do %>
+  <div id="card-element">
+    <!-- Un élément Stripe Element sera inséré ici. -->
+  </div>
+
+  <button type="submit" class="btn btn-primary">Payer 5€</button>
+<% end %>
+
+<div id="payment-errors" role="alert"></div>
+
+
+<script>
+  // Créer une instance de Stripe
+  var stripe = Stripe('pk_test_UjApN2yBGIDXSuI4WNlXQcdD'); // Remplacez par votre clé publique Stripe
+
+  // Créer une instance d'éléments Stripe
+  var elements = stripe.elements();
+  var card = elements.create('card');
+  card.mount('#card-element');
+
+  // Ajouter un écouteur d'événements pour gérer la soumission du formulaire
+  var form = document.getElementById('payment-form');
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    stripe.createToken(card).then(function(result) {
+      if (result.error) {
+        var errorElement = document.getElementById('payment-errors');
+        errorElement.textContent = result.error.message;
+      } else {
+        // Si le Token est créé avec succès, soumettre le formulaire.
+        var form = document.getElementById('payment-form');
+        var hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'stripeToken');
+        hiddenInput.setAttribute('value', result.token.id);
+        form.appendChild(hiddenInput);
+        form.submit();
+      }
+    });
+  });
+</script>

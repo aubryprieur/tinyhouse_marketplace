@@ -51,15 +51,20 @@ class HousesController < ApplicationController
   end
 
   def create
-    @house = House.new(house_params)
+    @house = House.new(house_params.except(:images))
     @house.user = current_user
-    authorize @house
+
     if @house.save
-      redirect_to houses_path, notice: 'Maison créée avec succès et en attente de validation.'
+      if params[:house][:images] && params[:house][:images].size > 3
+        redirect_to new_house_payment_path(@house)
+      else
+        redirect_to @house, notice: 'Maison créée avec succès.'
+      end
     else
       render :new
     end
   end
+
 
   def update
     authorize @house
