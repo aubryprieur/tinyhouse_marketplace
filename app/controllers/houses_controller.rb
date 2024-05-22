@@ -50,13 +50,17 @@ class HousesController < ApplicationController
     @house = House.new
   end
 
-  def create
-    @house = House.new(house_params.except(:images))
+   def create
+    @house = House.new(house_params)
     @house.user = current_user
+    authorize @house
 
     if @house.save
-      if params[:house][:images] && params[:house][:images].size > 3
-        redirect_to new_house_payment_path(@house)
+      if house_params[:images].present?
+        @house.images.attach(house_params[:images])
+      end
+      if @house.images.count > 3
+        redirect_to new_house_payment_path(@house), notice: 'Maison créée avec succès. Veuillez effectuer le paiement pour ajouter plus de 3 photos.'
       else
         redirect_to @house, notice: 'Maison créée avec succès.'
       end

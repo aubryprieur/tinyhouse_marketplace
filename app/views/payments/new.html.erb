@@ -1,14 +1,14 @@
 <!-- app/views/payments/new.html.erb -->
 <%= form_tag house_payments_path(@house), id: 'payment-form' do %>
+  <div>Paiment</div>
   <div id="card-element">
     <!-- Un élément Stripe Element sera inséré ici. -->
   </div>
 
-  <button type="submit" class="btn btn-primary">Payer 5€</button>
+  <button type="submit" class="btn btn-primary center">Payer 5€</button>
 <% end %>
 
 <div id="payment-errors" role="alert"></div>
-
 
 <script>
   // Créer une instance de Stripe
@@ -28,9 +28,9 @@
       if (result.error) {
         var errorElement = document.getElementById('payment-errors');
         errorElement.textContent = result.error.message;
+        errorElement.style.display = 'block';
       } else {
         // Si le Token est créé avec succès, soumettre le formulaire.
-        var form = document.getElementById('payment-form');
         var hiddenInput = document.createElement('input');
         hiddenInput.setAttribute('type', 'hidden');
         hiddenInput.setAttribute('name', 'stripeToken');
@@ -41,3 +41,4 @@
     });
   });
 </script>
+

@@ -83,4 +83,21 @@ body, html {
   margin-bottom: 20px;
 }
 
-/* Vos styles existants pour .flex-container, .house-listing, .house-card, etc. */
+/* app/assets/stylesheets/application.css */
+
+#card-element {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 4px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  width: 100%;
+  .btn {
+
+  }
+}
+
+#payment-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
