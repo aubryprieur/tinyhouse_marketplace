@@ -6,7 +6,6 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    # Assurez-vous de récupérer le token de Stripe
     token = params[:stripeToken]
 
     begin
@@ -19,7 +18,15 @@ class PaymentsController < ApplicationController
 
       if charge.paid
         @house.update(payment_status: true, stripe_charge_id: charge.id)
-        redirect_to @house, notice: 'Payment successful!'
+
+        # Attacher les images après le paiement réussi
+        if session[:pending_images]
+          pending_images = session[:pending_images]
+          attach_images(pending_images)
+          session.delete(:pending_images)
+        end
+
+        redirect_to @house, notice: 'Payment successful and images attached!'
       else
         redirect_to new_house_payment_path(@house), alert: 'Payment failed!'
       end
@@ -28,11 +35,18 @@ class PaymentsController < ApplicationController
     end
   end
 
-
-
   private
 
   def set_house
     @house = House.find(params[:house_id])
   end
+
+  def attach_images(image_paths)
+    image_paths.each do |image_path|
+      image = File.open(image_path)
+      @house.images.attach(io: image, filename: File.basename(image_path))
+    end
+  end
 end
+
+

@@ -1,8 +1,10 @@
 <!-- app/views/houses/show.html.erb -->
 <div class="container">
   <div class="house-details">
-    <% @house.images.each do |image| %>
-      <%= image_tag image.variant(resize_to_limit: [500, 500]), class: "house-image" %>
+    <% if @house.images.attached? %>
+      <% @house.images.each do |image| %>
+        <%= image_tag image.variant(resize_to_limit: [500, 500]), class: "house-image" %>
+      <% end %>
     <% end %>
     <h1><%= @house.title %></h1>
     <p><%= @house.description %></p>
@@ -44,14 +46,12 @@
       </script>
     <% end %>
     <p class="house-card-price"><%= number_to_currency(@house.price) %></p>
-    <!-- Boutons de modification et de suppression -->
     <% if policy(@house).update? %>
       <%= link_to 'Modifier', edit_house_path(@house), class: 'btn btn-primary' %>
     <% end %>
     <% if policy(@house).destroy? %>
       <%= link_to 'Supprimer', house_path(@house), data: { turbo_method: :delete, turbo_confirm: 'Êtes-vous sûr ?' }, class: 'btn btn-danger' %>
     <% end %>
-    <!-- Formulaire pour mettre en avant la maison -->
     <% if current_user.super_admin? %>
       <%= form_with model: @house, local: true do |form| %>
         <div class="form-group">
@@ -61,14 +61,13 @@
         <%= form.submit 'Mettre à jour', class: 'btn btn-info' %>
       <% end %>
     <% end %>
-    <!-- Condition pour vérifier si l'utilisateur est connecté -->
-     <!-- <% if user_signed_in? %>
+    <% if user_signed_in? %>
       <div id="phone-number">
         <button data-controller="house" data-action="click->house#showPhoneNumber" data-house-phone-number-value="<%= @house.user.phone_number %>">Voir le numéro</button>
       </div>
     <% else %>
       <%= link_to "Se connecter pour voir les coordonnées", new_user_session_path %>
-    <% end %>-->
+    <% end %>
 
     <%= link_to "Envoyer un message", new_house_message_path(@house), class: "btn" %>
 
@@ -84,9 +83,9 @@
         }
       });
     </script>
-
   </div>
 </div>
+
 
 
 

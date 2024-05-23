@@ -4,7 +4,6 @@ class HousesController < ApplicationController
   before_action :check_reported, only: [:show]
   before_action :set_houses, only: [:index, :search]
 
-
   def index
     @houses_with_address = @houses.geocoded.where.not(address: [nil, ""], city: [nil, ""], postal_code: [nil, ""])
   end
@@ -27,20 +26,17 @@ class HousesController < ApplicationController
   end
 
   def feature
-    @house = House.find(params[:id])
-    if @house.update(featured_params)
-      respond_to do |format|
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(@house, partial: "houses/house", locals: { house: @house }) }
-        format.html { redirect_to houses_path, notice: 'Maison mise à jour.' }
-      end
+    if @house.update(featured: !@house.featured)
+      redirect_to @house, notice: 'Le statut de la maison a été mis à jour.'
     else
-      render :show, status: :unprocessable_entity
+      redirect_to @house, alert: 'La mise à jour du statut de la maison a échoué.'
     end
   end
 
   def show
     @house = House.find(params[:id])
     @is_favorite = current_user.favorite_houses.exists?(@house.id)
+    Rails.logger.debug "Total images attached: #{@house.images.count}"
   end
 
   def edit
@@ -50,18 +46,20 @@ class HousesController < ApplicationController
     @house = House.new
   end
 
-   def create
-    @house = House.new(house_params)
+  def create
+    @house = House.new(house_params.except(:images))
     @house.user = current_user
     authorize @house
 
     if @house.save
-      if house_params[:images].present?
-        @house.images.attach(house_params[:images])
-      end
-      if @house.images.count > 3
-        redirect_to new_house_payment_path(@house), notice: 'Maison créée avec succès. Veuillez effectuer le paiement pour ajouter plus de 3 photos.'
+      filtered_images = house_params[:images].reject(&:blank?)
+
+      if filtered_images.size > 3 && !@house.payment_status
+        session[:pending_images] = save_images_to_tmp(filtered_images)
+        flash[:alert] = 'Vous devez payer pour télécharger plus de 3 photos.'
+        redirect_to new_house_payment_path(@house, amount: 500)
       else
+        attach_images(filtered_images)
         redirect_to @house, notice: 'Maison créée avec succès.'
       end
     else
@@ -69,15 +67,17 @@ class HousesController < ApplicationController
     end
   end
 
-
   def update
     authorize @house
-    # Vérifie s'il y a de nouvelles images à attacher
     if house_params[:images]
-      @house.images.attach(house_params[:images])
+      if house_params[:images].size + @house.images.size > 3 && !@house.payment_status
+        session[:pending_images] = save_images_to_tmp(house_params[:images])
+        redirect_to new_house_payment_path(@house, amount: 500), notice: 'Vous devez payer pour télécharger plus de 3 photos.'
+      else
+        attach_images(house_params[:images])
+      end
     end
 
-    # Mise à jour des autres attributs de @house sans les images
     if @house.update(house_params.except(:images))
       redirect_to @house, notice: 'Maison mise à jour avec succès.'
     else
@@ -115,8 +115,25 @@ class HousesController < ApplicationController
     params.require(:house).permit(:title, :description, :price, :address, :city, :postal_code, :featured, :latitude, :longitude, images: [])
   end
 
-  def featured_params
-    params.require(:house).permit(:featured)
+  def attach_images(images)
+    @house.images.purge if @house.images.attached?
+
+    images.each do |image|
+      @house.images.attach(image)
+    end
+  end
+
+  def save_images_to_tmp(images)
+    image_paths = []
+    images.each do |image|
+      path = Rails.root.join('tmp', 'uploads', "#{SecureRandom.uuid}_#{image.original_filename}")
+      FileUtils.mkdir_p(File.dirname(path))
+      File.open(path, 'wb') do |file|
+        file.write(image.read)
+      end
+      image_paths << path.to_s
+    end
+    image_paths
   end
 
   def check_reported
@@ -124,17 +141,6 @@ class HousesController < ApplicationController
       redirect_to root_path, alert: "Cette maison a été signalée et n'est pas accessible."
     end
   end
-
-  def filtered_houses
-    if current_user.super_admin?
-      House.all
-    else
-      House.includes(:reports).where.not(id: Report.where(resolved: false).select(:house_id))
-    end
-  end
-
-  def filter_validated_houses
-    @houses = current_user.super_admin? ? House.all : House.where(validated: true)
-  end
-
 end
+
+

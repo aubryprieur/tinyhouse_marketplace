@@ -5,7 +5,11 @@ Rails.application.routes.draw do
   # Routes for Houses
   resources :houses do
     resource :favorites, only: [:create, :destroy]
-    resources :payments, only: [:new, :create]
+    resources :payments, only: [:new, :create] do
+      collection do
+        get 'success', to: 'payments#success', as: 'success'
+      end
+    end
     resources :messages, only: [:new, :create]
     resources :reports, only: :create
 
@@ -31,5 +35,3 @@ Rails.application.routes.draw do
   # Home page
   root "houses#index"
 end
-
-
